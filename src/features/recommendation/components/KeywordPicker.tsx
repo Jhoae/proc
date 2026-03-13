@@ -1,5 +1,7 @@
+import type { KeywordOption } from "../types";
+
 type KeywordPickerProps = {
-  keywords: readonly string[];
+  keywords: readonly KeywordOption[];
   selectedKeywords: string[];
   onToggle: (keyword: string) => void;
 };
@@ -12,16 +14,17 @@ export function KeywordPicker({
   return (
     <div className="keyword-picker">
       {keywords.map((keyword) => {
-        const isSelected = selectedKeywords.includes(keyword);
+        const isSelected = selectedKeywords.includes(keyword.id);
 
         return (
           <button
-            key={keyword}
+            key={keyword.id}
             type="button"
             className={isSelected ? "keyword-chip active" : "keyword-chip"}
-            onClick={() => onToggle(keyword)}
+            onClick={() => onToggle(keyword.id)}
           >
-            #{keyword}
+            <span className="keyword-chip-label">#{keyword.label}</span>
+            <span className="keyword-chip-copy">{keyword.description}</span>
           </button>
         );
       })}

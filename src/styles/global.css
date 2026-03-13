@@ -118,21 +118,26 @@ p {
 }
 
 .keyword-picker {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
   margin-bottom: 18px;
 }
 
 .keyword-chip {
-  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 14px 16px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 18px;
   background: #dfe8fb;
   color: #1a3f85;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  text-align: left;
 }
 
 .keyword-chip.active {
@@ -140,12 +145,23 @@ p {
   color: #fff;
 }
 
+.keyword-chip-label {
+  font-size: 0.95rem;
+}
+
+.keyword-chip-copy {
+  color: inherit;
+  font-size: 0.84rem;
+  font-weight: 500;
+  opacity: 0.82;
+}
+
 .project-card {
   padding: 22px;
 }
 
 .project-card h3,
-.timeline-item h3 {
+.planning-card h3 {
   margin-bottom: 10px;
   font-size: 1.1rem;
 }
@@ -172,6 +188,33 @@ p {
   font-size: 0.95rem;
 }
 
+.card-badge-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.match-badge,
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.match-badge {
+  background: #eef4ff;
+  color: #2452a5;
+}
+
+.score-badge {
+  background: #14213d;
+  color: #fff;
+}
+
 .deliverables {
   display: grid;
   gap: 8px;
@@ -188,10 +231,39 @@ p {
   font-size: 0.92rem;
 }
 
+.select-project-button,
+.reset-button {
+  margin-top: 18px;
+  border: 0;
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.select-project-button {
+  width: 100%;
+  background: #edf4ff;
+  color: #1f4b98;
+}
+
+.select-project-button.active {
+  background: #14213d;
+  color: #fff;
+}
+
 .planning-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+
+.planning-toolbar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) 160px;
+  gap: 14px;
+  margin-bottom: 16px;
 }
 
 .planning-card {
@@ -208,16 +280,52 @@ p {
   margin-top: 12px;
 }
 
-.planning-list {
-  margin: 18px 0 0;
-  padding-left: 18px;
+.planning-field,
+.project-meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.planning-field {
+  margin-top: 16px;
+}
+
+.planning-field span,
+.project-meta-field span {
   color: #24355c;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.planning-field input,
+.planning-field textarea,
+.project-meta-field input {
+  width: 100%;
+  border: 1px solid rgba(20, 33, 61, 0.12);
+  border-radius: 14px;
+  padding: 12px 14px;
+  font: inherit;
+  color: #14213d;
+  background: #fdfefe;
+}
+
+.planning-field textarea {
+  resize: vertical;
+}
+
+.reset-button {
+  align-self: end;
+  background: #ffe8e3;
+  color: #8c2f1c;
 }
 
 @media (max-width: 900px) {
   .hero-metrics,
   .card-grid,
-  .planning-grid {
+  .planning-grid,
+  .keyword-picker,
+  .planning-toolbar {
     grid-template-columns: 1fr;
   }
 }
