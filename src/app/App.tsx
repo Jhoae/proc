@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CareerProfilePanel } from "../features/career/components/CareerProfilePanel";
 import { careerTracks, projectWindows } from "../features/career/data/careerTracks";
+import { WorkspaceSidebar } from "../features/planning/components/WorkspaceSidebar";
 import { KeywordPicker } from "../features/recommendation/components/KeywordPicker";
 import { RecommendationList } from "../features/recommendation/components/RecommendationList";
 import { projectCatalog } from "../features/recommendation/data/projectCatalog";
@@ -8,11 +9,12 @@ import { recommendProjects } from "../features/recommendation/engine/recommendPr
 import { keywordOptions } from "../features/recommendation/data/keywordOptions";
 import { PlanningBoard } from "../features/planning/components/PlanningBoard";
 import { planningSections } from "../features/planning/data/planningSections";
-import { usePlanningRecord } from "../features/planning/hooks/usePlanningRecord";
 import { createInitialRecord } from "../features/planning/utils/createInitialRecord";
+import { SignInPanel } from "../features/session/components/SignInPanel";
 import { PortfolioOutputs } from "../features/strategy/components/PortfolioOutputs";
 import { RoadmapPanel } from "../features/strategy/components/RoadmapPanel";
 import { deliveryStages } from "../features/strategy/data/deliveryStages";
+import { useProcApp } from "../features/storage/useProcApp";
 
 export function App() {
   const [selectedTrackId, setSelectedTrackId] = useState("backend-engineer");
@@ -22,7 +24,17 @@ export function App() {
     "finance",
     "portfolio",
   ]);
-  const { record, setRecord } = usePlanningRecord();
+  const {
+    currentUser,
+    workspaces,
+    activeWorkspace,
+    signIn,
+    signOut,
+    updateUserTrack,
+    createNewWorkspace,
+    selectWorkspace,
+    updateWorkspace,
+  } = useProcApp();
 
   const recommendations = recommendProjects(
     projectCatalog,
@@ -31,9 +43,15 @@ export function App() {
     selectedWindowId,
   );
   const selectedRecommendation =
-    recommendations.find(({ project }) => project.title === record.selectedTopic) ??
+    recommendations.find(({ project }) => project.title === activeWorkspace?.selectedTopic) ??
     recommendations[0];
   const selectedTrack = careerTracks.find((track) => track.id === selectedTrackId);
+
+  useEffect(() => {
+    if (currentUser?.trackId) {
+      setSelectedTrackId(currentUser.trackId);
+    }
+  }, [currentUser]);
 
   function toggleKeyword(keyword: string) {
     setSelectedKeywords((current) =>
@@ -44,16 +62,25 @@ export function App() {
   }
 
   function handleSelectProject(title: string) {
-    setRecord((current) => ({
-      ...current,
+    if (!activeWorkspace) {
+      return;
+    }
+
+    updateWorkspace(activeWorkspace.id, (workspace) => ({
+      ...workspace,
       selectedTopic: title,
+      projectName: workspace.projectName === workspace.selectedTopic ? title : workspace.projectName,
       updatedAt: new Date().toISOString(),
     }));
   }
 
   function handleProjectNameChange(projectName: string) {
-    setRecord((current) => ({
-      ...current,
+    if (!activeWorkspace) {
+      return;
+    }
+
+    updateWorkspace(activeWorkspace.id, (workspace) => ({
+      ...workspace,
       projectName,
       updatedAt: new Date().toISOString(),
     }));
@@ -64,13 +91,17 @@ export function App() {
     field: "title" | "notes" | "nextAction",
     value: string,
   ) {
-    setRecord((current) => ({
-      ...current,
+    if (!activeWorkspace) {
+      return;
+    }
+
+    updateWorkspace(activeWorkspace.id, (workspace) => ({
+      ...workspace,
       updatedAt: new Date().toISOString(),
       sections: {
-        ...current.sections,
+        ...workspace.sections,
         [sectionId]: {
-          ...current.sections[sectionId],
+          ...workspace.sections[sectionId],
           [field]: value,
         },
       },
@@ -78,7 +109,33 @@ export function App() {
   }
 
   function resetRecord() {
-    setRecord(createInitialRecord(planningSections));
+    if (!activeWorkspace) {
+      return;
+    }
+
+    const initialRecord = createInitialRecord(planningSections);
+    updateWorkspace(activeWorkspace.id, (workspace) => ({
+      ...workspace,
+      ...initialRecord,
+      id: workspace.id,
+      ownerId: workspace.ownerId,
+    }));
+  }
+
+  if (!currentUser) {
+    return (
+      <main className="page-shell">
+        <SignInPanel
+          tracks={careerTracks}
+          defaultTrackId={selectedTrackId}
+          onSubmit={(name, trackId) => {
+            setSelectedTrackId(trackId);
+            signIn(name, trackId);
+          }}
+        />
+        <RoadmapPanel stages={deliveryStages} />
+      </main>
+    );
   }
 
   return (
@@ -101,16 +158,30 @@ export function App() {
             <span>추천 결과</span>
           </div>
           <div>
-            <strong>{record.updatedAt.slice(0, 10)}</strong>
+            <strong>{activeWorkspace?.updatedAt.slice(0, 10) ?? "-"}</strong>
             <span>마지막 저장일</span>
           </div>
         </div>
       </section>
 
+      <WorkspaceSidebar
+        currentUser={currentUser}
+        workspaces={workspaces}
+        activeWorkspaceId={activeWorkspace?.id ?? null}
+        onSelectWorkspace={selectWorkspace}
+        onCreateWorkspace={() =>
+          createNewWorkspace(selectedRecommendation?.project.title ?? "proc: 프로젝트 추천과 기록 플랫폼")
+        }
+        onSignOut={signOut}
+      />
+
       <CareerProfilePanel
         tracks={careerTracks}
         selectedTrackId={selectedTrackId}
-        onSelectTrack={setSelectedTrackId}
+        onSelectTrack={(trackId) => {
+          setSelectedTrackId(trackId);
+          updateUserTrack(trackId);
+        }}
         windows={projectWindows}
         selectedWindowId={selectedWindowId}
         onSelectWindow={setSelectedWindowId}
@@ -129,7 +200,7 @@ export function App() {
         <RecommendationList
           projects={recommendations}
           onSelectProject={handleSelectProject}
-          selectedProjectTitle={record.selectedTopic}
+          selectedProjectTitle={activeWorkspace?.selectedTopic ?? ""}
         />
       </section>
 
@@ -147,14 +218,14 @@ export function App() {
           <label className="project-meta-field">
             <span>내 프로젝트 이름</span>
             <input
-              value={record.projectName}
+              value={activeWorkspace?.projectName ?? ""}
               onChange={(event) => handleProjectNameChange(event.target.value)}
               placeholder="예: proc 취업 포트폴리오 MVP"
             />
           </label>
           <label className="project-meta-field">
             <span>선택한 추천 주제</span>
-            <input value={record.selectedTopic} readOnly />
+            <input value={activeWorkspace?.selectedTopic ?? ""} readOnly />
           </label>
           <button type="button" className="reset-button" onClick={resetRecord}>
             기록 초기화
@@ -162,7 +233,7 @@ export function App() {
         </div>
         <PlanningBoard
           sections={planningSections}
-          record={record}
+          record={activeWorkspace ?? createInitialRecord(planningSections)}
           onFieldChange={handleFieldChange}
         />
       </section>
