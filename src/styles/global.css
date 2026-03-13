@@ -17,6 +17,13 @@ body {
   min-width: 320px;
 }
 
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
 h1,
 h2,
 h3,
@@ -170,6 +177,38 @@ p {
   color: #24355c;
 }
 
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.workspace-list {
+  display: grid;
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.workspace-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 16px 18px;
+  border: 1px solid rgba(20, 33, 61, 0.08);
+  border-radius: 18px;
+  background: #fff;
+  color: #14213d;
+  cursor: pointer;
+  text-align: left;
+}
+
+.workspace-card.active {
+  border-color: rgba(47, 111, 237, 0.35);
+  background: #eff5ff;
+}
+
 .section-heading {
   display: flex;
   flex-direction: column;
@@ -302,12 +341,13 @@ p {
 }
 
 .select-project-button,
-.reset-button {
+.reset-button,
+.primary-button,
+.secondary-button {
   margin-top: 18px;
   border: 0;
   border-radius: 14px;
   padding: 12px 14px;
-  font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
@@ -321,6 +361,16 @@ p {
 .select-project-button.active {
   background: #14213d;
   color: #fff;
+}
+
+.primary-button {
+  background: #14213d;
+  color: #fff;
+}
+
+.secondary-button {
+  background: #eef4ff;
+  color: #2452a5;
 }
 
 .planning-grid {
@@ -370,14 +420,26 @@ p {
 
 .planning-field input,
 .planning-field textarea,
-.project-meta-field input {
+.project-meta-field input,
+.project-meta-field select {
   width: 100%;
   border: 1px solid rgba(20, 33, 61, 0.12);
   border-radius: 14px;
   padding: 12px 14px;
-  font: inherit;
   color: #14213d;
   background: #fdfefe;
+}
+
+.sign-in-hero {
+  display: grid;
+  gap: 18px;
+}
+
+.sign-in-form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) 220px;
+  gap: 14px;
+  align-items: end;
 }
 
 .planning-field textarea {
@@ -398,8 +460,13 @@ p {
   .planning-toolbar,
   .profile-grid,
   .output-grid,
-  .roadmap-grid {
+  .roadmap-grid,
+  .sign-in-form {
     grid-template-columns: 1fr;
+  }
+
+  .workspace-header {
+    flex-direction: column;
   }
 }
 

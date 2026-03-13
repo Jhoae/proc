@@ -11,6 +11,8 @@
 ## Current MVP
 
 - 희망 직무와 프로젝트 기간을 반영한 추천 점수 계산
+- 이름 기반 개인 작업공간 로그인
+- 프로젝트별 다중 저장 워크스페이스
 - 추천 결과를 기록 보드와 연결
 - 브레인스토밍, 기획, 진행 기록, 회고 입력 폼
 - `localStorage` 기반 자동 저장
@@ -39,12 +41,14 @@ src/
     career/
     planning/
     recommendation/
+    session/
+    storage/
     strategy/
   styles/
 ```
 
 ## Next steps
 
-- 로그인, DB, 팀 협업 기능 연동
-- 프로젝트별 다중 기록 저장
+- 실제 인증과 DB 연동
 - 사용자별 추천 히스토리와 포트폴리오 export
+- 팀 프로젝트 초대와 기록 히스토리 비교
