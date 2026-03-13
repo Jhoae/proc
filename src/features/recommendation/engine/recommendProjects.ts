@@ -30,6 +30,21 @@ function getMatchLabel(score: number) {
   return "탐색 추천";
 }
 
+function getWindowBonus(
+  complexity: ProjectTopic["complexity"],
+  selectedWindowId: "4w" | "8w" | "12w",
+) {
+  if (selectedWindowId === "4w") {
+    return complexity === "low" ? 5 : complexity === "medium" ? 2 : 0;
+  }
+
+  if (selectedWindowId === "8w") {
+    return complexity === "medium" ? 5 : 3;
+  }
+
+  return complexity === "high" ? 5 : 3;
+}
+
 function buildReason(matchedKeywords: KeywordOption[], project: ProjectTopic) {
   const labels = matchedKeywords.map((keyword) => keyword.label).join(", ");
   return `${labels} 키워드가 맞고, ${project.complexity === "low" ? "빠른 MVP" : "실무형 설계"} 흐름에 어울립니다.`;
@@ -38,6 +53,8 @@ function buildReason(matchedKeywords: KeywordOption[], project: ProjectTopic) {
 export function recommendProjects(
   projects: ProjectTopic[],
   selectedKeywords: string[],
+  selectedTrackId: string,
+  selectedWindowId: "4w" | "8w" | "12w",
 ): RecommendationResult[] {
   const keywordMap = getKeywordMap(keywordOptions);
 
@@ -51,7 +68,12 @@ export function recommendProjects(
         .filter((keyword): keyword is KeywordOption => keyword !== undefined);
 
       const weightedScore = matchedKeywords.reduce((sum, keyword) => sum + keyword.weight, 0);
-      const score = weightedScore + getComplexityBonus(project.complexity);
+      const roleBonus = project.focusRoles.includes(selectedTrackId) ? 5 : 0;
+      const score =
+        weightedScore +
+        roleBonus +
+        getComplexityBonus(project.complexity) +
+        getWindowBonus(project.complexity, selectedWindowId);
 
       return {
         project,
@@ -67,4 +89,3 @@ export function recommendProjects(
     .filter(({ matchedKeywordIds }) => matchedKeywordIds.length > 0)
     .sort((left, right) => right.score - left.score);
 }
-

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { CareerProfilePanel } from "../features/career/components/CareerProfilePanel";
+import { careerTracks, projectWindows } from "../features/career/data/careerTracks";
 import { KeywordPicker } from "../features/recommendation/components/KeywordPicker";
 import { RecommendationList } from "../features/recommendation/components/RecommendationList";
 import { projectCatalog } from "../features/recommendation/data/projectCatalog";
@@ -8,8 +10,13 @@ import { PlanningBoard } from "../features/planning/components/PlanningBoard";
 import { planningSections } from "../features/planning/data/planningSections";
 import { usePlanningRecord } from "../features/planning/hooks/usePlanningRecord";
 import { createInitialRecord } from "../features/planning/utils/createInitialRecord";
+import { PortfolioOutputs } from "../features/strategy/components/PortfolioOutputs";
+import { RoadmapPanel } from "../features/strategy/components/RoadmapPanel";
+import { deliveryStages } from "../features/strategy/data/deliveryStages";
 
 export function App() {
+  const [selectedTrackId, setSelectedTrackId] = useState("backend-engineer");
+  const [selectedWindowId, setSelectedWindowId] = useState<"4w" | "8w" | "12w">("8w");
   const [selectedKeywords, setSelectedKeywords] = useState<string[]>([
     "backend",
     "finance",
@@ -17,7 +24,16 @@ export function App() {
   ]);
   const { record, setRecord } = usePlanningRecord();
 
-  const recommendations = recommendProjects(projectCatalog, selectedKeywords);
+  const recommendations = recommendProjects(
+    projectCatalog,
+    selectedKeywords,
+    selectedTrackId,
+    selectedWindowId,
+  );
+  const selectedRecommendation =
+    recommendations.find(({ project }) => project.title === record.selectedTopic) ??
+    recommendations[0];
+  const selectedTrack = careerTracks.find((track) => track.id === selectedTrackId);
 
   function toggleKeyword(keyword: string) {
     setSelectedKeywords((current) =>
@@ -91,6 +107,15 @@ export function App() {
         </div>
       </section>
 
+      <CareerProfilePanel
+        tracks={careerTracks}
+        selectedTrackId={selectedTrackId}
+        onSelectTrack={setSelectedTrackId}
+        windows={projectWindows}
+        selectedWindowId={selectedWindowId}
+        onSelectWindow={setSelectedWindowId}
+      />
+
       <section className="section-block">
         <div className="section-heading">
           <p className="eyebrow">Recommendation</p>
@@ -107,6 +132,11 @@ export function App() {
           selectedProjectTitle={record.selectedTopic}
         />
       </section>
+
+      <PortfolioOutputs
+        recommendation={selectedRecommendation}
+        trackLabel={selectedTrack?.label ?? "개발자"}
+      />
 
       <section className="section-block planning-block">
         <div className="section-heading">
@@ -136,6 +166,8 @@ export function App() {
           onFieldChange={handleFieldChange}
         />
       </section>
+
+      <RoadmapPanel stages={deliveryStages} />
     </main>
   );
 }

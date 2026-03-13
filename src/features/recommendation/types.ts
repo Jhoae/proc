@@ -9,6 +9,7 @@ export type ProjectTopic = {
   title: string;
   summary: string;
   keywords: string[];
+  focusRoles: string[];
   value: string;
   deliverables: string[];
   complexity: "low" | "medium" | "high";
@@ -21,4 +22,3 @@ export type RecommendationResult = {
   matchLabel: string;
   reason: string;
 };
-
