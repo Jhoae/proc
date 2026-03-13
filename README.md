@@ -8,6 +8,14 @@
 - 일반 메모장이 아니라 프로젝트 진행에 필요한 기록 흐름을 기능 단위로 나눌 수 있습니다.
 - 이후 로그인, 저장, 추천 로직 고도화, 협업 기능을 붙이기 쉬운 구조로 시작합니다.
 
+## Current MVP
+
+- 희망 직무와 프로젝트 기간을 반영한 추천 점수 계산
+- 추천 결과를 기록 보드와 연결
+- 브레인스토밍, 기획, 진행 기록, 회고 입력 폼
+- `localStorage` 기반 자동 저장
+- 이력서 문장, 면접 질문, README 체크리스트 출력
+
 ## Tech Stack
 
 - React
@@ -24,16 +32,19 @@ npm run dev
 ## Project structure
 
 ```text
+docs/
 src/
   app/
   features/
+    career/
     planning/
     recommendation/
+    strategy/
   styles/
 ```
 
 ## Next steps
 
-- 키워드 기반 추천 점수 고도화
-- 프로젝트 기록 작성 폼과 저장 기능 추가
 - 로그인, DB, 팀 협업 기능 연동
+- 프로젝트별 다중 기록 저장
+- 사용자별 추천 히스토리와 포트폴리오 export
