@@ -2,7 +2,12 @@ import { useEffect, useState } from "react";
 import { createInitialRecord } from "../planning/utils/createInitialRecord";
 import { planningSections } from "../planning/data/planningSections";
 import { loadProcStore, saveProcStore } from "./localStore";
-import type { ProcStore, ProcUser, ProcWorkspace } from "./types";
+import type {
+  ProcStore,
+  ProcUser,
+  ProcWorkspace,
+  RecommendationHistoryItem,
+} from "./types";
 
 function slugifyName(value: string) {
   return value.trim().toLowerCase().replace(/\s+/g, "-");
@@ -38,6 +43,7 @@ export function useProcApp() {
 
   const currentUser = store.users.find((user) => user.id === store.session.currentUserId) ?? null;
   const workspaces = store.workspaces.filter((workspace) => workspace.ownerId === currentUser?.id);
+  const history = store.history.filter((item) => item.userId === currentUser?.id);
   const activeWorkspace =
     workspaces.find((workspace) => workspace.id === store.session.selectedWorkspaceId) ?? workspaces[0] ?? null;
 
@@ -49,6 +55,7 @@ export function useProcApp() {
       createWorkspace(nextUser.id, "proc: 프로젝트 추천과 기록 플랫폼");
 
     setStore((current) => ({
+      ...current,
       users: existingUser ? current.users : [...current.users, nextUser],
       workspaces: current.workspaces.some((workspace) => workspace.id === nextWorkspace.id)
         ? current.workspaces
@@ -126,15 +133,43 @@ export function useProcApp() {
     }));
   }
 
+  function addRecommendationHistory(
+    workspaceId: string,
+    projectTitle: string,
+    reason: string,
+    scoreLabel: string,
+  ) {
+    if (!currentUser) {
+      return;
+    }
+
+    const item: RecommendationHistoryItem = {
+      id: `history-${crypto.randomUUID()}`,
+      userId: currentUser.id,
+      workspaceId,
+      projectTitle,
+      reason,
+      scoreLabel,
+      createdAt: new Date().toISOString(),
+    };
+
+    setStore((current) => ({
+      ...current,
+      history: [item, ...current.history].slice(0, 30),
+    }));
+  }
+
   return {
     currentUser,
     workspaces,
     activeWorkspace,
+    history,
     signIn,
     signOut,
     updateUserTrack,
     createNewWorkspace,
     selectWorkspace,
     updateWorkspace,
+    addRecommendationHistory,
   };
 }

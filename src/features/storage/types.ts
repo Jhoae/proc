@@ -12,6 +12,16 @@ export type ProcWorkspace = PlanningRecord & {
   ownerId: string;
 };
 
+export type RecommendationHistoryItem = {
+  id: string;
+  userId: string;
+  workspaceId: string;
+  projectTitle: string;
+  reason: string;
+  scoreLabel: string;
+  createdAt: string;
+};
+
 export type ProcSession = {
   currentUserId: string | null;
   selectedWorkspaceId: string | null;
@@ -20,5 +30,6 @@ export type ProcSession = {
 export type ProcStore = {
   users: ProcUser[];
   workspaces: ProcWorkspace[];
+  history: RecommendationHistoryItem[];
   session: ProcSession;
 };

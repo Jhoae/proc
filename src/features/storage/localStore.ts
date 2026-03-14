@@ -5,6 +5,7 @@ const STORAGE_KEY = "proc-app-store";
 export const initialStore: ProcStore = {
   users: [],
   workspaces: [],
+  history: [],
   session: {
     currentUserId: null,
     selectedWorkspaceId: null,

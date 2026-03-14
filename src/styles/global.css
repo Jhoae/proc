@@ -119,7 +119,8 @@ p {
 
 .profile-panel,
 .output-card,
-.roadmap-card {
+.roadmap-card,
+.history-card {
   background: #fff;
   border-radius: 20px;
   border: 1px solid rgba(20, 33, 61, 0.08);
@@ -175,6 +176,16 @@ p {
   margin: 12px 0 0;
   padding-left: 18px;
   color: #24355c;
+}
+
+.history-list {
+  display: grid;
+  gap: 12px;
+}
+
+.history-card {
+  display: grid;
+  gap: 6px;
 }
 
 .workspace-header {
@@ -452,6 +463,22 @@ p {
   color: #8c2f1c;
 }
 
+.output-card-wide {
+  grid-column: span 2;
+}
+
+.export-block {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 16px;
+  background: #f6f8fc;
+  padding: 16px;
+  color: #24355c;
+  font-family: "SFMono-Regular", "Menlo", monospace;
+  font-size: 0.9rem;
+}
+
 @media (max-width: 900px) {
   .hero-metrics,
   .card-grid,
@@ -467,6 +494,10 @@ p {
 
   .workspace-header {
     flex-direction: column;
+  }
+
+  .output-card-wide {
+    grid-column: span 1;
   }
 }
 
