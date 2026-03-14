@@ -12,6 +12,7 @@ import { planningSections } from "../features/planning/data/planningSections";
 import { createInitialRecord } from "../features/planning/utils/createInitialRecord";
 import { SignInPanel } from "../features/session/components/SignInPanel";
 import { PortfolioOutputs } from "../features/strategy/components/PortfolioOutputs";
+import { RecommendationHistory } from "../features/strategy/components/RecommendationHistory";
 import { RoadmapPanel } from "../features/strategy/components/RoadmapPanel";
 import { deliveryStages } from "../features/strategy/data/deliveryStages";
 import { useProcApp } from "../features/storage/useProcApp";
@@ -28,12 +29,14 @@ export function App() {
     currentUser,
     workspaces,
     activeWorkspace,
+    history,
     signIn,
     signOut,
     updateUserTrack,
     createNewWorkspace,
     selectWorkspace,
     updateWorkspace,
+    addRecommendationHistory,
   } = useProcApp();
 
   const recommendations = recommendProjects(
@@ -66,12 +69,23 @@ export function App() {
       return;
     }
 
+    const selectedItem = recommendations.find(({ project }) => project.title === title);
+
     updateWorkspace(activeWorkspace.id, (workspace) => ({
       ...workspace,
       selectedTopic: title,
       projectName: workspace.projectName === workspace.selectedTopic ? title : workspace.projectName,
       updatedAt: new Date().toISOString(),
     }));
+
+    if (selectedItem) {
+      addRecommendationHistory(
+        activeWorkspace.id,
+        selectedItem.project.title,
+        selectedItem.reason,
+        selectedItem.matchLabel,
+      );
+    }
   }
 
   function handleProjectNameChange(projectName: string) {
@@ -207,7 +221,10 @@ export function App() {
       <PortfolioOutputs
         recommendation={selectedRecommendation}
         trackLabel={selectedTrack?.label ?? "개발자"}
+        workspace={activeWorkspace}
       />
+
+      <RecommendationHistory items={history} />
 
       <section className="section-block planning-block">
         <div className="section-heading">

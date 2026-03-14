@@ -1,17 +1,24 @@
 import type { RecommendationResult } from "../../recommendation/types";
+import type { ProcWorkspace } from "../../storage/types";
+import { buildPortfolioSummary } from "../utils/buildPortfolioSummary";
 
 type PortfolioOutputsProps = {
   recommendation: RecommendationResult | undefined;
   trackLabel: string;
+  workspace: ProcWorkspace | null;
 };
 
-export function PortfolioOutputs({ recommendation, trackLabel }: PortfolioOutputsProps) {
-  if (!recommendation) {
+export function PortfolioOutputs({
+  recommendation,
+  trackLabel,
+  workspace,
+}: PortfolioOutputsProps) {
+  if (!recommendation || !workspace) {
     return null;
   }
 
   const { project, reason, matchLabel } = recommendation;
-  const resumePoint = `${project.title}를 직접 설계하며 ${project.value}`;
+  const portfolio = buildPortfolioSummary(workspace, recommendation, trackLabel);
   const interviewQuestion = `${trackLabel} 지원자로서 ${project.title}에서 가장 중요하게 설계한 기준은 무엇이었나요?`;
 
   return (
@@ -23,7 +30,7 @@ export function PortfolioOutputs({ recommendation, trackLabel }: PortfolioOutput
       <div className="output-grid">
         <article className="output-card">
           <p className="output-label">이력서 한 줄</p>
-          <h3>{resumePoint}</h3>
+          <h3>{portfolio.resumeSummary}</h3>
         </article>
         <article className="output-card">
           <p className="output-label">추천 이유 요약</p>
@@ -37,10 +44,18 @@ export function PortfolioOutputs({ recommendation, trackLabel }: PortfolioOutput
         <article className="output-card">
           <p className="output-label">README 체크리스트</p>
           <ul className="output-list">
-            {project.deliverables.map((deliverable) => (
+            {portfolio.recommendedDeliverables.map((deliverable) => (
               <li key={deliverable}>{deliverable}</li>
             ))}
           </ul>
+        </article>
+        <article className="output-card output-card-wide">
+          <p className="output-label">README 초안</p>
+          <pre className="export-block">{portfolio.readmeDraft}</pre>
+        </article>
+        <article className="output-card output-card-wide">
+          <p className="output-label">면접 답변 초안</p>
+          <pre className="export-block">{portfolio.interviewAnswer}</pre>
         </article>
       </div>
     </section>
